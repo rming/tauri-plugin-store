@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { invoke } from '@tauri-apps/api/tauri'
-import { appWindow } from '@tauri-apps/api/window'
+import { listen } from '@tauri-apps/api/event'
 
 interface ChangePayload<T> {
   path: string
@@ -175,7 +175,7 @@ export class Store {
    * @param cb 
    */
   onKeyChange<T>(key: string, cb: (value: T | null) => void) {
-    appWindow.listen<ChangePayload<T>>('store://change', event => {
+    listen<ChangePayload<T>>('store://change', event => {
       if (event.payload.path === this.path && event.payload.key === key) {
         cb(event.payload.value)
       }
@@ -187,7 +187,7 @@ export class Store {
    * @param cb 
    */
   onChange(cb: (key: string, value: unknown) => void) {
-    appWindow.listen<ChangePayload<unknown>>('store://change', event => {
+    listen<ChangePayload<unknown>>('store://change', event => {
       if (event.payload.path === this.path) {
         cb(event.payload.key, event.payload.value)
       }
