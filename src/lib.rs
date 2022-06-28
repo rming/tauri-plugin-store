@@ -68,7 +68,7 @@ async fn set<R: Runtime>(
 ) -> Result<(), Error> {
   with_store(&app, stores, path.clone(), |store| {
     store.cache.insert(key.clone(), value.clone());
-    let _ = window.emit("store://change", ChangePayload { path, key, value });
+    let _ = app.emit_all("store://change", ChangePayload { path, key, value });
     Ok(())
   })
 }
@@ -108,7 +108,7 @@ async fn delete<R: Runtime>(
   with_store(&app, stores, path.clone(), |store| {
     let flag = store.cache.remove(&key).is_some();
     if flag {
-      let _ = window.emit(
+      let _ = app.emit_all(
         "store://change",
         ChangePayload {
           path,
@@ -132,7 +132,7 @@ async fn clear<R: Runtime>(
     let keys = store.cache.keys().cloned().collect::<Vec<String>>();
     store.cache.clear();
     for key in keys {
-      let _ = window.emit(
+      let _ = app.emit_all(
         "store://change",
         ChangePayload {
           path: path.clone(),
@@ -164,7 +164,7 @@ async fn reset<R: Runtime>(
       if let Some(defaults) = &store.defaults {
         for (key, value) in &store.cache {
           if defaults.get(key) != Some(value) {
-            let _ = window.emit(
+            let _ = app.emit_all(
               "store://change",
               ChangePayload {
                 path: path.clone(),
