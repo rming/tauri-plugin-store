@@ -68,7 +68,9 @@ async fn set<R: Runtime>(
 ) -> Result<(), Error> {
   with_store(&app, stores, path.clone(), |store| {
     store.cache.insert(key.clone(), value.clone());
-    let _ = app.emit_all("store://change", ChangePayload { path, key, value });
+    let payload = ChangePayload { path, key, value };
+    let _ = app.emit_all("store://change", payload.clone());
+    let _ = app.trigger_global("store://change", serde_json::to_string(&payload).ok());
     Ok(())
   })
 }
@@ -108,14 +110,13 @@ async fn delete<R: Runtime>(
   with_store(&app, stores, path.clone(), |store| {
     let flag = store.cache.remove(&key).is_some();
     if flag {
-      let _ = app.emit_all(
-        "store://change",
-        ChangePayload {
-          path,
-          key,
-          value: JsonValue::Null,
-        },
-      );
+      let payload = ChangePayload {
+        path,
+        key,
+        value: JsonValue::Null,
+      };
+      let _ = app.emit_all("store://change", payload.clone());
+      let _ = app.trigger_global("store://change", serde_json::to_string(&payload).ok());
     }
     Ok(flag)
   })
@@ -132,14 +133,13 @@ async fn clear<R: Runtime>(
     let keys = store.cache.keys().cloned().collect::<Vec<String>>();
     store.cache.clear();
     for key in keys {
-      let _ = app.emit_all(
-        "store://change",
-        ChangePayload {
-          path: path.clone(),
-          key,
-          value: JsonValue::Null,
-        },
-      );
+      let payload = ChangePayload {
+        path: path.clone(),
+        key,
+        value: JsonValue::Null,
+      };
+      let _ = app.emit_all("store ://change", payload.clone());
+      let _ = app.trigger_global("store://change", serde_json::to_string(&payload).ok());
     }
     Ok(())
   })
@@ -164,14 +164,13 @@ async fn reset<R: Runtime>(
       if let Some(defaults) = &store.defaults {
         for (key, value) in &store.cache {
           if defaults.get(key) != Some(value) {
-            let _ = app.emit_all(
-              "store://change",
-              ChangePayload {
-                path: path.clone(),
-                key: key.clone(),
-                value: defaults.get(key).cloned().unwrap_or(JsonValue::Null),
-              },
-            );
+            let payload = ChangePayload {
+              path: path.clone(),
+              key: key.clone(),
+              value: defaults.get(key).cloned().unwrap_or(JsonValue::Null),
+            };
+            let _ = app.emit_all("store://change", payload.clone());
+            let _ = app.trigger_global("store://change", serde_json::to_string(&payload).ok());
           }
         }
         store.cache = defaults.clone();
