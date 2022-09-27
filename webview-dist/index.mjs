@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api/tauri';
-import { listen } from '@tauri-apps/api/event';
+import { appWindow } from '@tauri-apps/api/window';
 
 // Copyright 2021 Tauri Programme within The Commons Conservancy
 /**
@@ -150,9 +150,10 @@ class Store {
      * Listen to changes on a store key.
      * @param key
      * @param cb
+     * @returns A promise resolving to a function to unlisten to the event.
      */
     onKeyChange(key, cb) {
-        listen('store://change', event => {
+        return appWindow.listen('store://change', event => {
             if (event.payload.path === this.path && event.payload.key === key) {
                 cb(event.payload.value);
             }
@@ -161,9 +162,10 @@ class Store {
     /**
      * Listen to changes on the store.
      * @param cb
+     * @returns A promise resolving to a function to unlisten to the event.
      */
     onChange(cb) {
-        listen('store://change', event => {
+        return appWindow.listen('store://change', event => {
             if (event.payload.path === this.path) {
                 cb(event.payload.key, event.payload.value);
             }

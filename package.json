@@ -27,15 +27,15 @@
     "license": "MIT",
     "devDependencies": {
         "@rollup/plugin-node-resolve": "13.3.0",
-        "@rollup/plugin-typescript": "8.3.3",
-        "rollup": "2.75.7",
+        "@rollup/plugin-typescript": "8.5.0",
+        "rollup": "2.78.1",
         "rollup-plugin-terser": "7.0.2",
         "type-fest": "2.12.2",
-        "typedoc": "0.22.15",
-        "typescript": "4.7.4"
+        "typedoc": "0.23.10",
+        "typescript": "4.8.3"
     },
     "dependencies": {
-        "@tauri-apps/api": "1.0.1",
+        "@tauri-apps/api": "1.1.0",
         "tslib": "2.4.0"
     }
 }
